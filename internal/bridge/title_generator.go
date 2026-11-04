@@ -39,13 +39,6 @@ var (
 	reTrimHyphens        = regexp.MustCompile(`^-+|-+$`)
 )
 
-// CdpEvaluator defines the minimal CDP interface needed by TitleGeneratorService and PromptDispatcher.
-type CdpEvaluator interface {
-	GetPrimaryContextId() *int
-	Call(ctx context.Context, method string, params map[string]any) (map[string]any, error)
-	GetCurrentWorkspaceName() string
-}
-
 // TitleGeneratorService generates short session/topic titles.
 type TitleGeneratorService struct{}
 
@@ -88,8 +81,15 @@ func (s *TitleGeneratorService) generateViaCdp(ctx context.Context, prompt strin
 		return ""
 	}
 
-	resMap, _ := result["result"].(map[string]any)
-	valMap, _ := resMap["value"].(map[string]any)
+	var evalRes runtimeEvaluateResponse
+	if err := json.Unmarshal(result, &evalRes); err != nil {
+		return ""
+	}
+
+	var valMap map[string]any
+	if err := json.Unmarshal(evalRes.Result.Value, &valMap); err != nil {
+		return ""
+	}
 
 	okVal, _ := valMap["ok"].(bool)
 	titleVal, _ := valMap["title"].(string)
