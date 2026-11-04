@@ -1,0 +1,108 @@
+package cli
+
+import (
+	"os"
+	"path/filepath"
+
+	"antigravity-telegram-remote/internal/config"
+	"antigravity-telegram-remote/internal/logger"
+	"github.com/spf13/cobra"
+)
+
+// Version stores the semantic package version (default "0.2.12", injectable via ldflags).
+var Version = "0.2.12"
+
+// RootOptions represents global CLI flags (--verbose and --quiet).
+type RootOptions struct {
+	Verbose bool
+	Quiet   bool
+}
+
+// ResolveCliLogLevel resolves log level precedence: --verbose ("debug") > --quiet ("error") > nil.
+func ResolveCliLogLevel(opts RootOptions) *logger.LogLevel {
+	if opts.Verbose {
+		lvl := logger.LevelDebug
+		return &lvl
+	}
+	if opts.Quiet {
+		lvl := logger.LevelError
+		return &lvl
+	}
+	return nil
+}
+
+// NewRootCmd constructs the root "antigravity-telegram-remote" command and registers subcommands.
+func NewRootCmd() *cobra.Command {
+	var rootOpts RootOptions
+
+	rootCmd := &cobra.Command{
+		Use:     "antigravity-telegram-remote",
+		Short:   "Điều khiển trợ lý lập trình AI của bạn từ Telegram",
+		Version: Version,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cwd, err := os.Getwd()
+			if err != nil {
+				cwd = "."
+			}
+			hasConfig := config.ConfigExists()
+			_, envErr := os.Stat(filepath.Join(cwd, ".env"))
+			hasEnv := envErr == nil
+
+			if !hasConfig && !hasEnv {
+				PrintWelcome()
+				return SetupAction(cmd.Context())
+			}
+			return StartAction(cmd.Context(), rootOpts, nil)
+		},
+	}
+
+	rootCmd.PersistentFlags().BoolVar(&rootOpts.Verbose, "verbose", false, "Hiển thị nhật ký cấp độ debug")
+	rootCmd.PersistentFlags().BoolVar(&rootOpts.Quiet, "quiet", false, "Chỉ hiển thị lỗi")
+
+	// Subcommand: start
+	startCmd := &cobra.Command{
+		Use:   "start",
+		Short: "Bắt đầu bot Telegram",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return StartAction(cmd.Context(), rootOpts, nil)
+		},
+	}
+
+	// Subcommand: setup
+	setupCmd := &cobra.Command{
+		Use:   "setup",
+		Short: "Trình hướng dẫn thiết lập tương tác",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return SetupAction(cmd.Context())
+		},
+	}
+
+	// Subcommand: open
+	openCmd := &cobra.Command{
+		Use:   "open",
+		Short: "Mở Antigravity với CDP được bật (tự động chọn cổng khả dụng)",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return OpenAction(cmd.Context())
+		},
+	}
+
+	// Subcommand: doctor
+	var doctorOpts DoctorOptions
+	doctorCmd := &cobra.Command{
+		Use:   "doctor",
+		Short: "Kiểm tra môi trường và các phụ thuộc",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return DoctorAction(cmd.Context(), doctorOpts)
+		},
+	}
+	doctorCmd.Flags().BoolVar(&doctorOpts.Selectors, "selectors", false, "Kiểm tra tình trạng các bộ chọn DOM (ADR-003)")
+
+	rootCmd.AddCommand(startCmd, setupCmd, openCmd, doctorCmd)
+
+	return rootCmd
+}
+
+// Execute runs the root command.
+func Execute() error {
+	return NewRootCmd().Execute()
+}
