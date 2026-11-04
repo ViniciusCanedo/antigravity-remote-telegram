@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
@@ -21,6 +22,7 @@ import (
 	"antigravity-telegram-remote/internal/database"
 	"antigravity-telegram-remote/internal/logger"
 	"antigravity-telegram-remote/internal/platform"
+	"antigravity-telegram-remote/internal/voice"
 	"antigravity-telegram-remote/internal/workspace"
 
 	tgbot "github.com/go-telegram/bot"
@@ -163,6 +165,12 @@ type Bot struct {
 	WorkspaceHandler     *WorkspaceCommandHandler
 	JoinHandler          *JoinCommandHandler
 	TgBot                *tgbot.Bot
+	telegramSender       TelegramSender
+	fileResolver         TelegramFileResolver
+	workspaceResolver    func(ctx context.Context, ch TelegramChannel) *ResolvedWorkspaceCdp
+	whisperInspector     *voice.WhisperInspector
+	whisperRunner        voice.WhisperRunner
+	httpClient           *http.Client
 
 	stateMu                 sync.RWMutex
 	userStopRequested       map[string]struct{}
@@ -314,7 +322,8 @@ func (b *Bot) ClearPlanContentCache(channelKey string) {
 
 // ReplyHTML sends an HTML message to the given Telegram channel.
 func (b *Bot) ReplyHTML(ctx context.Context, ch TelegramChannel, text string, keyboard *ui.InlineKeyboardMarkup) error {
-	if b.TgBot == nil {
+	sender := b.getSender()
+	if sender == nil {
 		return nil
 	}
 
@@ -330,7 +339,7 @@ func (b *Bot) ReplyHTML(ctx context.Context, ch TelegramChannel, text string, ke
 		params.ReplyMarkup = keyboard.ToTelegramModel()
 	}
 
-	_, err := b.TgBot.SendMessage(ctx, params)
+	_, err := sender.SendMessage(ctx, params)
 	return err
 }
 
@@ -602,8 +611,43 @@ func (a autoAcceptCheckerAdapter) Handle(mode string) (bridge.AutoAcceptResult, 
 	}, nil
 }
 
+// SetWorkspaceResolver overrides the workspace resolver for tests.
+func (b *Bot) SetWorkspaceResolver(fn func(ctx context.Context, ch TelegramChannel) *ResolvedWorkspaceCdp) {
+	b.stateMu.Lock()
+	defer b.stateMu.Unlock()
+	b.workspaceResolver = fn
+}
+
+// SetWhisperInspector overrides the Whisper environment inspector for tests.
+func (b *Bot) SetWhisperInspector(insp *voice.WhisperInspector) {
+	b.stateMu.Lock()
+	defer b.stateMu.Unlock()
+	b.whisperInspector = insp
+}
+
+// SetWhisperRunner overrides the Whisper audio transcription runner for tests.
+func (b *Bot) SetWhisperRunner(runner voice.WhisperRunner) {
+	b.stateMu.Lock()
+	defer b.stateMu.Unlock()
+	b.whisperRunner = runner
+}
+
+// SetHTTPClient overrides the HTTP client used for downloading media files (for tests).
+func (b *Bot) SetHTTPClient(client *http.Client) {
+	b.stateMu.Lock()
+	defer b.stateMu.Unlock()
+	b.httpClient = client
+}
+
 // ResolveWorkspaceAndCdp resolves the workspace bound to ch and connects to CDP.
 func (b *Bot) ResolveWorkspaceAndCdp(ctx context.Context, ch TelegramChannel) *ResolvedWorkspaceCdp {
+	b.stateMu.RLock()
+	resolver := b.workspaceResolver
+	b.stateMu.RUnlock()
+	if resolver != nil {
+		return resolver(ctx, ch)
+	}
+
 	key := ChannelKey(ch)
 	if b.WorkspaceBindingRepo == nil {
 		return nil
@@ -1482,6 +1526,66 @@ func StartBot(ctx context.Context, cliLogLevel *logger.LogLevel) error {
 		JoinHandler:          joinHandler,
 	})
 
+	promptDispatcher.SetSendPromptImpl(func(
+		c context.Context,
+		bridgeRef any,
+		ch bridge.TelegramChannel,
+		prompt string,
+		cdpEval bridge.CdpEvaluator,
+		modeSvc *bridge.ModeService,
+		modelSvc *bridge.ModelService,
+		inboundImages []bridge.InboundImageAttachment,
+		options *bridge.PromptDispatchOptions,
+	) error {
+		threadID := 0
+		if ch.ThreadID != nil {
+			threadID = *ch.ThreadID
+		}
+		targetCh := TelegramChannel{
+			ChatID:   ch.ChatID,
+			ThreadID: threadID,
+		}
+
+		botInbound := make([]InboundImageAttachment, 0, len(inboundImages))
+		for _, img := range inboundImages {
+			botInbound = append(botInbound, InboundImageAttachment{
+				LocalPath: img.LocalPath,
+				URL:       img.URL,
+				Name:      img.FileName,
+				MimeType:  img.MimeType,
+			})
+		}
+
+		var promptOpts *PromptSendOptions
+		if options != nil {
+			var csSvc *cdp.ChatSessionService
+			if s, ok := options.ChatSessionService.(*cdp.ChatSessionService); ok {
+				csSvc = s
+			}
+			var tm *TelegramTopicManager
+			if t, ok := options.TopicManager.(*TelegramTopicManager); ok {
+				tm = t
+			}
+			promptOpts = &PromptSendOptions{
+				ChatSessionService: csSvc,
+				ChatSessionRepo:    options.ChatSessionRepo,
+				TopicManager:       tm,
+				TitleGenerator:     options.TitleGenerator,
+			}
+		}
+
+		var cdpSvc CdpServiceClient
+		if clientAdapter, ok := cdpEval.(*cdpServiceWithContextsAdapter); ok && clientAdapter != nil {
+			if poolClient, ok := clientAdapter.client.(*cdp.Client); ok {
+				cdpSvc = poolClient
+			} else if c, ok := clientAdapter.client.(CdpServiceClient); ok {
+				cdpSvc = c
+			}
+		}
+
+		return botInstance.SendPromptToAntigravity(c, targetCh, prompt, cdpSvc, botInbound, promptOpts)
+	})
+
 	if cfg.TelegramBotToken != "" {
 		botClient, err := tgbot.New(
 			cfg.TelegramBotToken,
@@ -1493,6 +1597,7 @@ func StartBot(ctx context.Context, cliLogLevel *logger.LogLevel) error {
 		botInstance.TgBot = botClient
 		botInstance.TopicManager = NewTelegramTopicManager(NewBotForumTopicAPI(botClient), 0)
 		botInstance.RegisterCommands()
+		botInstance.RegisterMessageHandlers()
 		botInstance.SetupPoolEventListeners(pool)
 
 		logger.Info("Starting antigravity-telegram-remote Telegram bot...")

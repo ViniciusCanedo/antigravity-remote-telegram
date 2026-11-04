@@ -197,6 +197,13 @@ func (d *UserMessageDetector) AddEchoHash(text string) {
 	})
 }
 
+// HasEchoHash reports whether the given hash is currently recorded as an echo.
+func (d *UserMessageDetector) HasEchoHash(hash string) bool {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	return d.echoHashes[hash] > 0
+}
+
 // Start begins background monitoring. The first poll seeds current DOM state without firing callback.
 func (d *UserMessageDetector) Start() {
 	d.mu.Lock()
