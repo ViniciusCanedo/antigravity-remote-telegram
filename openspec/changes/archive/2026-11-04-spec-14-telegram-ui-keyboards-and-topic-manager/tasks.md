@@ -1,0 +1,41 @@
+# Tasks: Spec 14 — Telegram UI Keyboards and Topic Manager
+
+- [x] 1. Define common keyboard types and fluent constructors <!-- id: 1-types -->
+  - [x] 1.1 Create `internal/bot/ui/types.go` with `InlineKeyboardButton`, `InlineKeyboardMarkup`, `UIPayload`, `SendUIFunc`, and `EscapeHTML`
+  - [x] 1.2 Implement fluent methods `NewInlineKeyboard()`, `Text()`, `Row()`, and `ToTelegramModel()`
+- [x] 2. Implement Auto-Accept UI <!-- id: 2-autoaccept -->
+  - [x] 2.1 Implement `internal/bot/ui/autoaccept_ui.go` with constants, `AutoAcceptStateProvider`, `BuildAutoAcceptUI`, and `SendAutoAcceptUI`
+  - [x] 2.2 Implement `internal/bot/ui/autoaccept_ui_test.go` mirroring `tests/ui/autoAcceptUi.test.ts`
+- [x] 3. Implement Mode UI <!-- id: 3-mode -->
+  - [x] 3.1 Implement `internal/bot/ui/mode_ui.go` with `ModeCdpProvider`, `ModeServiceProvider`, `ModeUIDeps`, `BuildModeUI`, and `SendModeUI`
+  - [x] 3.2 Implement `internal/bot/ui/mode_ui_test.go` mirroring `tests/ui/modeUi.test.ts`
+- [x] 4. Implement Models UI <!-- id: 4-models -->
+  - [x] 4.1 Implement `internal/bot/ui/models_ui.go` with fuzzy matching, countdown formatting, quota fraction percentage, and `model_exhausted_` handling
+  - [x] 4.2 Implement `internal/bot/ui/models_ui_test.go` mirroring `tests/ui/modelsUi.test.ts`
+- [x] 5. Implement Plan UI <!-- id: 5-plan -->
+  - [x] 5.1 Implement `internal/bot/ui/plan_ui.go` with `MarkdownToTelegramHTML`, `PaginatePlanContent`, `BuildPlanNotificationUI`, and `BuildPlanContentUI`
+  - [x] 5.2 Implement `internal/bot/ui/plan_ui_test.go` mirroring `tests/ui/planUi.test.ts`
+- [x] 6. Implement Project List UI <!-- id: 6-project -->
+  - [x] 6.1 Implement `internal/bot/ui/project_ui.go` with 100-item pagination, clamping, `ParseProjectPageID`, and `IsProjectSelectID`
+  - [x] 6.2 Implement `internal/bot/ui/project_ui_test.go` mirroring `tests/ui/projectListUi.test.ts`
+- [x] 7. Implement Screenshot UI <!-- id: 7-screenshot -->
+  - [x] 7.1 Implement `internal/bot/ui/screenshot_ui.go` with `ScreenshotCapturer`, `SendPhotoFunc`, `SendTextFunc`, and `HandleScreenshot`
+  - [x] 7.2 Implement `internal/bot/ui/screenshot_ui_test.go` mirroring `tests/ui/screenshotUi.test.ts`
+- [x] 8. Implement Session Picker UI <!-- id: 8-session -->
+  - [x] 8.1 Implement `internal/bot/ui/session_ui.go` with `SessionListItem`, `IsSessionSelectID`, and `BuildSessionPickerUI` (capping at 25)
+  - [x] 8.2 Implement `internal/bot/ui/session_ui_test.go` mirroring `tests/ui/sessionPickerUi.test.ts`
+- [x] 9. Implement Template UI <!-- id: 9-template -->
+  - [x] 9.1 Implement `internal/bot/ui/template_ui.go` with `TemplateItem`, `ParseTemplateButtonID`, `BuildTemplateUI`, and `SendTemplateUI`
+  - [x] 9.2 Implement `internal/bot/ui/template_ui_test.go` mirroring `tests/ui/templateUi.test.ts`
+- [x] 10. Implement Telegram Topic Manager <!-- id: 10-topic-manager -->
+  - [x] 10.1 Implement `internal/bot/topic_manager.go` with `ForumTopicAPI`, thread-safe `TelegramTopicManager`, prefixing, and sanitization
+  - [x] 10.2 Implement `internal/bot/topic_manager_test.go` testing cache hit/miss, session topic creation, and sanitization rules
+- [x] 11. Run quality gates <!-- id: 11-quality-gates -->
+  - [x] 11.1 Run `go test -v -race ./...`
+  - [x] 11.2 Run `go vet ./...`
+  - [x] 11.3 Run `gofmt -l .` and ensure format cleanliness
+  - [x] 11.4 Run `go build ./...`
+- [x] 12. Sync capability delta and archive change <!-- id: 12-sync-and-archive -->
+  - [x] 12.1 Sync capability delta specs to `openspec/specs/telegram-ui/spec.md`
+  - [x] 12.2 Run `openspec archive -y spec-14-telegram-ui-keyboards-and-topic-manager`
+  - [x] 12.3 Re-verify quality gates after archiving
