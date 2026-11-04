@@ -1,0 +1,24 @@
+# Tasks: QuotaService, VoiceHandler, and ImageHandler
+
+- [x] 1. Quota Service (`internal/quota`)
+  - [x] 1.1 Implement data models, constants, and regexes in `internal/quota/service.go` (`QuotaInfo`, `ModelQuota`, `UserStatusData`, `LanguageServerProcessInfo`, `CsrfTokenRegex`, `BuildLsofPortRegex`)
+  - [x] 1.2 Implement parsing functions `ParseUnixProcessInfoOutput`, `ParseLsofListeningPortsOutput`, and `ParseUserStatusResponseBody`
+  - [x] 1.3 Implement `Service` struct, `NewService`, `FetchQuota`, `fetchQuotaWithRetry`, `getUnixProcessInfo`, `getListeningPorts`, and `requestAPI`
+  - [x] 1.4 Implement unit tests in `internal/quota/service_test.go` covering process discovery, port caching, retry on failure, and response parsing
+- [x] 2. Voice Handler (`internal/voice`)
+  - [x] 2.1 Implement data models, constants, regexes, and directory helpers in `internal/voice/transcriber.go` (`TelegramVoiceInfo`, `TelegramFileInfo`, `TelegramFileGetter`, `WhisperInspector`, `WhisperRunner`, `TempVoiceDir`, `StripWhisperTimestamps`)
+  - [x] 2.2 Implement `CheckWhisperAvailability`, `DownloadTelegramVoice`, and `TranscribeVoice` with deferred file cleanup
+  - [x] 2.3 Implement unit tests in `internal/voice/transcriber_test.go` covering availability checks, download scenarios, error cases, default `.ogg` extension, transcription failure cleanup, and timestamp stripping
+- [x] 3. Image Handler (`internal/bot`)
+  - [x] 3.1 Implement constants, regexes, and data models in `internal/bot/image_handler.go` (`InboundImageAttachment`, `TelegramPhotoInfo`, `ExtractedResponseImage`, `TelegramInputFileResult`, `TelegramFileResolver`, `TempImageDir`)
+  - [x] 3.2 Implement `IsImageAttachment`, `MimeTypeToExtension`, `SanitizeFileName`, `BuildPromptWithAttachmentUrls`, `ImageToDataURL`, and `FileToDataURL`
+  - [x] 3.3 Implement `DownloadTelegramImages`, `CleanupInboundImageAttachments`, and `ToTelegramInputFile`
+  - [x] 3.4 Implement unit tests in `internal/bot/image_handler_test.go` covering validation, sanitization, prompt augmentation, download, cleanup, and file conversion
+- [x] 4. Quality Gate & Spec Sync
+  - [x] 4.1 Run `go test -v -race ./...` and ensure all tests pass
+  - [x] 4.2 Run `go vet ./...` and verify clean output
+  - [x] 4.3 Run `gofmt -w .` and check `gofmt -l .` is clean
+  - [x] 4.4 Run `go build ./...`
+  - [x] 4.5 Sync specs to `openspec/specs/quota-voice-image/spec.md`
+  - [x] 4.6 Archive change with `openspec archive -y spec-13-quota-voice-and-image-handlers`
+  - [x] 4.7 Re-verify quality gate post-archive
