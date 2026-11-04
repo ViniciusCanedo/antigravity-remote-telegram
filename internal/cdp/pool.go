@@ -340,6 +340,11 @@ func (p *ConnectionPool) On(event string, handler func(projectName string)) {
 	p.listeners[event] = append(p.listeners[event], handler)
 }
 
+// Emit triggers handlers for a lifecycle event.
+func (p *ConnectionPool) Emit(event string, projectName string) {
+	p.emit(event, projectName)
+}
+
 func (p *ConnectionPool) emit(event string, projectName string) {
 	p.mu.Lock()
 	handlers := make([]func(string), len(p.listeners[event]))
