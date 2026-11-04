@@ -20,6 +20,7 @@ type mockCdpEvaluator struct {
 	primaryContextID *int64
 	callFunc         func(ctx context.Context, method string, params map[string]any) (json.RawMessage, error)
 	calls            []cdpCallRecord
+	wsName           string
 }
 
 func newMockCDP(contextID *int64) *mockCdpEvaluator {
@@ -44,6 +45,12 @@ func (m *mockCdpEvaluator) GetPrimaryContextId() *int64 {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	return m.primaryContextID
+}
+
+func (m *mockCdpEvaluator) GetCurrentWorkspaceName() string {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.wsName
 }
 
 func (m *mockCdpEvaluator) getCalls() []cdpCallRecord {

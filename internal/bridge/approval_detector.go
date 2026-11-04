@@ -18,6 +18,8 @@ type CdpEvaluator interface {
 	// GetPrimaryContextId returns the execution context ID of the primary Antigravity window,
 	// or nil if no primary context is registered (in which case contextId is omitted).
 	GetPrimaryContextId() *int64
+	// GetCurrentWorkspaceName returns the name of the currently active workspace.
+	GetCurrentWorkspaceName() string
 }
 
 // runtimeEvaluateResponse represents the standard Chrome DevTools Protocol response envelope

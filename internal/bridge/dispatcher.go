@@ -8,12 +8,6 @@ import (
 	"antigravity-telegram-remote/internal/database"
 )
 
-// TelegramChannel represents a Telegram chat and optional thread (topic).
-type TelegramChannel struct {
-	ChatID   int64
-	ThreadID *int
-}
-
 // InboundImageAttachment represents an incoming image attachment.
 type InboundImageAttachment struct {
 	FileName string

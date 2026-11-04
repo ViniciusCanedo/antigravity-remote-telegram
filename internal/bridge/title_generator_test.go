@@ -2,31 +2,11 @@ package bridge
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"strings"
 	"testing"
 )
-
-type mockCdpEvaluator struct {
-	contextID *int
-	callFn    func(ctx context.Context, method string, params map[string]any) (map[string]any, error)
-	wsName    string
-}
-
-func (m *mockCdpEvaluator) GetPrimaryContextId() *int {
-	return m.contextID
-}
-
-func (m *mockCdpEvaluator) Call(ctx context.Context, method string, params map[string]any) (map[string]any, error) {
-	if m.callFn != nil {
-		return m.callFn(ctx, method, params)
-	}
-	return nil, nil
-}
-
-func (m *mockCdpEvaluator) GetCurrentWorkspaceName() string {
-	return m.wsName
-}
 
 func TestTitleGenerator_Fallback_GeneratesShortTitle(t *testing.T) {
 	service := NewTitleGeneratorService()
@@ -138,7 +118,7 @@ func TestTitleGenerator_Sanitize_EmptyStringReturnsUntitled(t *testing.T) {
 
 func TestTitleGenerator_ViaCDP_FallsBackOnCDPError(t *testing.T) {
 	mockCdp := &mockCdpEvaluator{
-		callFn: func(ctx context.Context, method string, params map[string]any) (map[string]any, error) {
+		callFunc: func(ctx context.Context, method string, params map[string]any) (json.RawMessage, error) {
 			return nil, errors.New("CDP error")
 		},
 	}
@@ -155,14 +135,8 @@ func TestTitleGenerator_ViaCDP_FallsBackOnCDPError(t *testing.T) {
 
 func TestTitleGenerator_ViaCDP_FallsBackOnOkFalse(t *testing.T) {
 	mockCdp := &mockCdpEvaluator{
-		callFn: func(ctx context.Context, method string, params map[string]any) (map[string]any, error) {
-			return map[string]any{
-				"result": map[string]any{
-					"value": map[string]any{
-						"ok": false,
-					},
-				},
-			}, nil
+		callFunc: func(ctx context.Context, method string, params map[string]any) (json.RawMessage, error) {
+			return makeEvaluateResponse(map[string]any{"ok": false}), nil
 		},
 	}
 
@@ -170,5 +144,19 @@ func TestTitleGenerator_ViaCDP_FallsBackOnOkFalse(t *testing.T) {
 	title := service.GenerateTitle(context.Background(), "テスト用プロンプト", mockCdp)
 	if title == "" {
 		t.Fatal("expected non-empty title")
+	}
+}
+
+func TestTitleGenerator_ViaCDP_Success(t *testing.T) {
+	mockCdp := &mockCdpEvaluator{
+		callFunc: func(ctx context.Context, method string, params map[string]any) (json.RawMessage, error) {
+			return makeEvaluateResponse(map[string]any{"ok": true, "title": "React Auth Bug"}), nil
+		},
+	}
+
+	service := NewTitleGeneratorService()
+	title := service.GenerateTitle(context.Background(), "プロンプト", mockCdp)
+	if title != "react-auth-bug" {
+		t.Fatalf("expected 'react-auth-bug', got %q", title)
 	}
 }
