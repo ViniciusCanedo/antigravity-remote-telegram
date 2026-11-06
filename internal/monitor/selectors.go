@@ -616,22 +616,22 @@ var ResponseSelectors = ResponseSelectorsCatalog{
 	DomObserver: `(() => {
         const panel = document.querySelector('.antigravity-agent-side-panel') || document.body;
         // Clean up previous observer if exists
-        if (window._antigravity-telegram-remoteObserver) window._antigravity-telegram-remoteObserver.disconnect();
+        if (window['_antigravity-telegram-remoteObserver']) window['_antigravity-telegram-remoteObserver'].disconnect();
         
         let debounceTimer;
         const notify = () => {
-            if (typeof window.onantigravity-telegram-remoteDOMChange === 'function') {
-                window.onantigravity-telegram-remoteDOMChange('changed');
+            if (typeof window['onantigravity-telegram-remoteDOMChange'] === 'function') {
+                window['onantigravity-telegram-remoteDOMChange']('changed');
             }
         };
 
-        window._antigravity-telegram-remoteObserver = new MutationObserver((mutations) => {
+        window['_antigravity-telegram-remoteObserver'] = new MutationObserver((mutations) => {
             clearTimeout(debounceTimer);
             // Throttle to 100ms to avoid flooding CDP during rapid streaming
             debounceTimer = setTimeout(notify, 100);
         });
 
-        window._antigravity-telegram-remoteObserver.observe(panel, {
+        window['_antigravity-telegram-remoteObserver'].observe(panel, {
             childList: true,
             subtree: true,
             characterData: true

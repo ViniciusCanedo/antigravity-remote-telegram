@@ -119,6 +119,12 @@ func RunDoctorSelectorsWithDeps(ctx context.Context, client CdpCaller, log logge
 			Result struct {
 				Value *SelectorEvalResult `json:"value"`
 			} `json:"result"`
+			ExceptionDetails *struct {
+				Text      string `json:"text"`
+				Exception *struct {
+					Description string `json:"description"`
+				} `json:"exception"`
+			} `json:"exceptionDetails"`
 		}
 
 		if err := json.Unmarshal(rawRes, &cdpRes); err != nil {
@@ -145,6 +151,12 @@ func RunDoctorSelectorsWithDeps(ctx context.Context, client CdpCaller, log logge
 			errMsg := "Unknown evaluation error"
 			if val != nil && val.Error != "" {
 				errMsg = val.Error
+			} else if cdpRes.ExceptionDetails != nil {
+				if cdpRes.ExceptionDetails.Exception != nil && cdpRes.ExceptionDetails.Exception.Description != "" {
+					errMsg = cdpRes.ExceptionDetails.Exception.Description
+				} else if cdpRes.ExceptionDetails.Text != "" {
+					errMsg = cdpRes.ExceptionDetails.Text
+				}
 			}
 			fmt.Fprintf(out, "  ❌ Broken: %s\n", errMsg)
 		}
