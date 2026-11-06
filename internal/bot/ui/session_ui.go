@@ -25,13 +25,13 @@ func IsSessionSelectID(customID string) bool {
 func BuildSessionPickerUI(sessions []SessionListItem) UIPayload {
 	if len(sessions) == 0 {
 		return UIPayload{
-			Text:     "<b>🔗 Tham gia phiên</b>\n\nKhông tìm thấy phiên nào trong bảng điều khiển của Antigravity.",
+			Text:     "<b>🔗 Attach Session</b>\n\nNo sessions found in Antigravity control panel.",
 			Keyboard: NewInlineKeyboard(),
 		}
 	}
 
 	text := fmt.Sprintf(
-		"<b>🔗 Tham gia phiên</b>\n\nChọn một phiên để tham gia (tìm thấy %d phiên)",
+		"<b>🔗 Attach Session</b>\n\nSelect a session to attach (%d sessions found)",
 		len(sessions),
 	)
 

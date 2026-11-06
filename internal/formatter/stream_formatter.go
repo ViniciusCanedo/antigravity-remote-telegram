@@ -15,14 +15,14 @@ var (
 // BuildModeModelLines generates mode/model lines for initial status display.
 // Consolidates into a single line if Fast and Plan models are the same (case-insensitive after trim).
 func BuildModeModelLines(modeName string, fastModel string, planModel string) []string {
-	lines := []string{fmt.Sprintf("Chế độ hiện tại: %s", modeName)}
+	lines := []string{fmt.Sprintf("Current mode: %s", modeName)}
 	if strings.EqualFold(strings.TrimSpace(fastModel), strings.TrimSpace(planModel)) {
-		lines = append(lines, fmt.Sprintf("Mô hình: %s", fastModel))
+		lines = append(lines, fmt.Sprintf("Model: %s", fastModel))
 		return lines
 	}
 
-	lines = append(lines, fmt.Sprintf("Mô hình Nhanh: %s", fastModel))
-	lines = append(lines, fmt.Sprintf("Mô hình Kế hoạch: %s", planModel))
+	lines = append(lines, fmt.Sprintf("Fast Model: %s", fastModel))
+	lines = append(lines, fmt.Sprintf("Plan Model: %s", planModel))
 	return lines
 }
 
@@ -116,7 +116,7 @@ func SplitForEmbedDescription(text string, maxLength int) []string {
 }
 
 // FitForSingleEmbedDescription fits text within the limit for a single Embed description (default maxLength = 3500).
-// When exceeding the limit, truncates the beginning and prioritizes displaying the most recent tail with prefix "...(phần đầu được lược bớt)\n".
+// When exceeding the limit, truncates the beginning and prioritizes displaying the most recent tail with prefix "...(earlier output truncated)\n".
 func FitForSingleEmbedDescription(text string, maxLength int) string {
 	if maxLength <= 0 {
 		maxLength = 3500
@@ -127,7 +127,7 @@ func FitForSingleEmbedDescription(text string, maxLength int) string {
 		return text
 	}
 
-	prefix := "...(phần đầu được lược bớt)\n"
+	prefix := "...(earlier output truncated)\n"
 	prefixRunes := []rune(prefix)
 
 	tailLength := maxLength - len(prefixRunes)

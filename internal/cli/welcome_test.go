@@ -16,7 +16,7 @@ func TestVisibleLength(t *testing.T) {
 		{"\x1b[36mhello\x1b[0m", 5},
 		{"\x1b[1m\x1b[32mhello world\x1b[0m", 11},
 		{"\x1b[2mTroubleshoot: \x1b[0m\x1b[32mantigravity-telegram-remote doctor\x1b[0m", 48},
-		{"Xin chào", 8},
+		{"Go 🚀", 4},
 	}
 
 	for _, tt := range tests {

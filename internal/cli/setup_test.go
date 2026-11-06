@@ -52,12 +52,12 @@ func TestParseAllowedUserIDs(t *testing.T) {
 
 func TestValidateAllowedUserIDs(t *testing.T) {
 	emptyErr := ValidateAllowedUserIDs("")
-	if emptyErr != "Vui lòng nhập ít nhất một ID người dùng." {
+	if emptyErr != "Please enter at least one user ID." {
 		t.Errorf("expected empty error message, got: %q", emptyErr)
 	}
 
 	invalidErr := ValidateAllowedUserIDs("12345, abc")
-	expectedInvalid := "ID người dùng không hợp lệ: \"abc\" — phải là một chuỗi số."
+	expectedInvalid := "Invalid user ID: \"abc\" — must be numeric."
 	if invalidErr != expectedInvalid {
 		t.Errorf("expected %q, got %q", expectedInvalid, invalidErr)
 	}
@@ -168,7 +168,7 @@ func TestSetupActionWithIO(t *testing.T) {
 	}
 
 	outStr := out.String()
-	if !strings.Contains(outStr, "Cài đặt hoàn tất!") {
+	if !strings.Contains(outStr, "Setup completed!") {
 		t.Errorf("expected completion message, got: %s", outStr)
 	}
 }

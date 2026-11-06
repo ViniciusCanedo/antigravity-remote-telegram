@@ -37,7 +37,7 @@ func NewRootCmd() *cobra.Command {
 
 	rootCmd := &cobra.Command{
 		Use:     "antigravity-telegram-remote",
-		Short:   "Điều khiển trợ lý lập trình AI của bạn từ Telegram",
+		Short:   "Control your AI coding assistant from Telegram",
 		Version: Version,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cwd, err := os.Getwd()
@@ -56,13 +56,13 @@ func NewRootCmd() *cobra.Command {
 		},
 	}
 
-	rootCmd.PersistentFlags().BoolVar(&rootOpts.Verbose, "verbose", false, "Hiển thị nhật ký cấp độ debug")
-	rootCmd.PersistentFlags().BoolVar(&rootOpts.Quiet, "quiet", false, "Chỉ hiển thị lỗi")
+	rootCmd.PersistentFlags().BoolVar(&rootOpts.Verbose, "verbose", false, "Show debug-level logs")
+	rootCmd.PersistentFlags().BoolVar(&rootOpts.Quiet, "quiet", false, "Show errors only")
 
 	// Subcommand: start
 	startCmd := &cobra.Command{
 		Use:   "start",
-		Short: "Bắt đầu bot Telegram",
+		Short: "Start the Telegram bot",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return StartAction(cmd.Context(), rootOpts, nil)
 		},
@@ -71,7 +71,7 @@ func NewRootCmd() *cobra.Command {
 	// Subcommand: setup
 	setupCmd := &cobra.Command{
 		Use:   "setup",
-		Short: "Trình hướng dẫn thiết lập tương tác",
+		Short: "Interactive setup wizard",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return SetupAction(cmd.Context())
 		},
@@ -80,7 +80,7 @@ func NewRootCmd() *cobra.Command {
 	// Subcommand: open
 	openCmd := &cobra.Command{
 		Use:   "open",
-		Short: "Mở Antigravity với CDP được bật (tự động chọn cổng khả dụng)",
+		Short: "Open Antigravity with CDP enabled (automatically selects an available port)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return OpenAction(cmd.Context())
 		},
@@ -90,12 +90,12 @@ func NewRootCmd() *cobra.Command {
 	var doctorOpts DoctorOptions
 	doctorCmd := &cobra.Command{
 		Use:   "doctor",
-		Short: "Kiểm tra môi trường và các phụ thuộc",
+		Short: "Check environment and dependencies",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return DoctorAction(cmd.Context(), doctorOpts)
 		},
 	}
-	doctorCmd.Flags().BoolVar(&doctorOpts.Selectors, "selectors", false, "Kiểm tra tình trạng các bộ chọn DOM (ADR-003)")
+	doctorCmd.Flags().BoolVar(&doctorOpts.Selectors, "selectors", false, "Check DOM selectors status (ADR-003)")
 
 	rootCmd.AddCommand(startCmd, setupCmd, openCmd, doctorCmd)
 

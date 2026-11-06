@@ -7,8 +7,6 @@ const Logo = `
   / /_\ \  |  \| |  | |   | | | |_) || |    |    |
  / /   \ \ | |\  |  | |   | | |  _ < | |    | || |
 /_/     \_\|_| \_|  |_|  |___||_| \_\|___|  |_||_|
-
-           QUAN NGUYEN - TNM
 `
 
 // SetupLogo is the ASCII art banner displayed at the beginning of the setup wizard.
@@ -18,5 +16,5 @@ const SetupLogo = `
 ` + ColorCyan + `           (   )` + ColorReset + `
 ` + ColorCyan + `           -"-"-` + ColorReset + `
 
-     ` + ColorBold + `~ Cài đặt Antigravity Telegram Remote ~` + ColorReset + `
+     ` + ColorBold + `~ Antigravity Telegram Remote Setup ~` + ColorReset + `
 `

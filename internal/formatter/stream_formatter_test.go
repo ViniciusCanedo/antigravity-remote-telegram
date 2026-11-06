@@ -10,8 +10,8 @@ func TestBuildModeModelLines(t *testing.T) {
 	t.Run("consolidates into a single line when both models are the same", func(t *testing.T) {
 		lines := BuildModeModelLines("Fast", "Gemini 3.1 Pro (High)", "Gemini 3.1 Pro (High)")
 		expected := []string{
-			"Chế độ hiện tại: Fast",
-			"Mô hình: Gemini 3.1 Pro (High)",
+			"Current mode: Fast",
+			"Model: Gemini 3.1 Pro (High)",
 		}
 		if !reflect.DeepEqual(lines, expected) {
 			t.Fatalf("BuildModeModelLines() = %v, want %v", lines, expected)
@@ -21,9 +21,9 @@ func TestBuildModeModelLines(t *testing.T) {
 	t.Run("shows both Fast and Plan models when they differ", func(t *testing.T) {
 		lines := BuildModeModelLines("Planning", "Claude Opus 4.6", "Gemini 3.1 Pro")
 		expected := []string{
-			"Chế độ hiện tại: Planning",
-			"Mô hình Nhanh: Claude Opus 4.6",
-			"Mô hình Kế hoạch: Gemini 3.1 Pro",
+			"Current mode: Planning",
+			"Fast Model: Claude Opus 4.6",
+			"Plan Model: Gemini 3.1 Pro",
 		}
 		if !reflect.DeepEqual(lines, expected) {
 			t.Fatalf("BuildModeModelLines() = %v, want %v", lines, expected)
@@ -119,7 +119,7 @@ func TestFitForSingleEmbedDescription(t *testing.T) {
 		if len([]rune(fitted)) > 120 {
 			t.Fatalf("fitted length %d exceeds 120 runes", len([]rune(fitted)))
 		}
-		if !strings.HasPrefix(fitted, "...(phần đầu được lược bớt)") {
+		if !strings.HasPrefix(fitted, "...(earlier output truncated)") {
 			t.Errorf("expected fitted to start with prefix, got %q", fitted)
 		}
 		if !strings.Contains(fitted, strings.Repeat("b", 40)) {

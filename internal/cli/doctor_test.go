@@ -36,6 +36,7 @@ func TestCheckEnvFile(t *testing.T) {
 }
 
 func TestCheckRequiredEnvVars(t *testing.T) {
+	t.Setenv("HOME", t.TempDir())
 	os.Unsetenv("TELEGRAM_BOT_TOKEN")
 	os.Unsetenv("ALLOWED_USER_IDS")
 

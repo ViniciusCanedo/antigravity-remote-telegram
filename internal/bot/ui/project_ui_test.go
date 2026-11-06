@@ -63,8 +63,8 @@ func makeTestWorkspaces(count int) []string {
 func TestBuildProjectListUI_ZeroWorkspaces(t *testing.T) {
 	res := BuildProjectListUI([]string{}, 0)
 
-	if !strings.Contains(res.Text, "Không tìm thấy dự án nào") {
-		t.Errorf("expected 'Không tìm thấy dự án nào', got: %s", res.Text)
+	if !strings.Contains(res.Text, "No projects found.") {
+		t.Errorf("expected 'No projects found.', got: %s", res.Text)
 	}
 	if res.Keyboard == nil || len(res.Keyboard.InlineKeyboard) != 0 {
 		t.Errorf("expected empty keyboard, got %+v", res.Keyboard)
@@ -75,16 +75,16 @@ func TestBuildProjectListUI_SinglePage(t *testing.T) {
 	workspaces := makeTestWorkspaces(5)
 	res := BuildProjectListUI(workspaces, 0)
 
-	if !strings.Contains(res.Text, "Dự án") {
-		t.Errorf("expected 'Dự án', got: %s", res.Text)
+	if !strings.Contains(res.Text, "Projects") {
+		t.Errorf("expected 'Projects', got: %s", res.Text)
 	}
 	for _, ws := range workspaces {
 		if !strings.Contains(res.Text, ws) {
 			t.Errorf("expected %s in text, got: %s", ws, res.Text)
 		}
 	}
-	if strings.Contains(res.Text, "Trang") {
-		t.Errorf("did not expect 'Trang' for single page, got: %s", res.Text)
+	if strings.Contains(res.Text, "Page") {
+		t.Errorf("did not expect 'Page' for single page, got: %s", res.Text)
 	}
 	if len(res.Keyboard.InlineKeyboard) != 5 {
 		t.Errorf("expected 5 keyboard rows, got %d", len(res.Keyboard.InlineKeyboard))
@@ -97,17 +97,17 @@ func TestBuildProjectListUI_MultiPage(t *testing.T) {
 
 	// Page 0
 	res0 := BuildProjectListUI(workspaces, 0)
-	if !strings.Contains(res0.Text, "Trang 1 / 2") {
-		t.Errorf("expected 'Trang 1 / 2', got: %s", res0.Text)
+	if !strings.Contains(res0.Text, "Page 1 / 2") {
+		t.Errorf("expected 'Page 1 / 2', got: %s", res0.Text)
 	}
-	if !strings.Contains(res0.Text, fmt.Sprintf("%d tổng số dự án", count)) {
+	if !strings.Contains(res0.Text, fmt.Sprintf("%d total projects", count)) {
 		t.Errorf("expected total projects count, got: %s", res0.Text)
 	}
 
 	// Page 1
 	res1 := BuildProjectListUI(workspaces, 1)
-	if !strings.Contains(res1.Text, "Trang 2 / 2") {
-		t.Errorf("expected 'Trang 2 / 2', got: %s", res1.Text)
+	if !strings.Contains(res1.Text, "Page 2 / 2") {
+		t.Errorf("expected 'Page 2 / 2', got: %s", res1.Text)
 	}
 	if !strings.Contains(res1.Text, workspaces[ProjectItemsPerPage]) {
 		t.Errorf("expected item %s in page 2, got: %s", workspaces[ProjectItemsPerPage], res1.Text)
@@ -118,16 +118,16 @@ func TestBuildProjectListUI_Clamping(t *testing.T) {
 	count := ProjectItemsPerPage + 5
 	workspaces := makeTestWorkspaces(count)
 
-	// Clamp page 100 to last page (Trang 2 / 2)
+	// Clamp page 100 to last page (Page 2 / 2)
 	resOverflow := BuildProjectListUI(workspaces, 100)
-	if !strings.Contains(resOverflow.Text, "Trang 2 / 2") {
-		t.Errorf("expected 'Trang 2 / 2', got: %s", resOverflow.Text)
+	if !strings.Contains(resOverflow.Text, "Page 2 / 2") {
+		t.Errorf("expected 'Page 2 / 2', got: %s", resOverflow.Text)
 	}
 
-	// Clamp negative page -5 to page 0 (Trang 1 / 2)
+	// Clamp negative page -5 to page 0 (Page 1 / 2)
 	resNegative := BuildProjectListUI(workspaces, -5)
-	if !strings.Contains(resNegative.Text, "Trang 1 / 2") {
-		t.Errorf("expected 'Trang 1 / 2', got: %s", resNegative.Text)
+	if !strings.Contains(resNegative.Text, "Page 1 / 2") {
+		t.Errorf("expected 'Page 1 / 2', got: %s", resNegative.Text)
 	}
 }
 
@@ -135,8 +135,8 @@ func TestBuildProjectListUI_ExactLimit(t *testing.T) {
 	workspaces := makeTestWorkspaces(ProjectItemsPerPage)
 	res := BuildProjectListUI(workspaces, 0)
 
-	if strings.Contains(res.Text, "Trang") {
-		t.Errorf("did not expect 'Trang' for exactly 100 items, got: %s", res.Text)
+	if strings.Contains(res.Text, "Page") {
+		t.Errorf("did not expect 'Page' for exactly 100 items, got: %s", res.Text)
 	}
 	if len(res.Keyboard.InlineKeyboard) != ProjectItemsPerPage {
 		t.Errorf("expected %d rows, got %d", ProjectItemsPerPage, len(res.Keyboard.InlineKeyboard))

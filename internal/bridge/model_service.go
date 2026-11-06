@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-
-	"antigravity-telegram-remote/internal/i18n"
 )
 
 // Model represents an LLM model selectable in Antigravity.
@@ -62,7 +60,7 @@ func (s *ModelService) SetModel(modelName string) ModelSetResult {
 	if strings.TrimSpace(modelName) == "" {
 		return ModelSetResult{
 			Success: false,
-			Error:   i18n.T("⚠️ Model name not specified. Available models: ") + strings.Join(s.GetAvailableModels(), ", "),
+			Error:   "⚠️ Model name not specified. Available models: " + strings.Join(s.GetAvailableModels(), ", "),
 		}
 	}
 
@@ -78,7 +76,7 @@ func (s *ModelService) SetModel(modelName string) ModelSetResult {
 	if !valid {
 		return ModelSetResult{
 			Success: false,
-			Error:   i18n.T(fmt.Sprintf("⚠️ Invalid model \"%s\". Available models: %s", modelName, strings.Join(s.GetAvailableModels(), ", "))),
+			Error:   fmt.Sprintf("⚠️ Invalid model \"%s\". Available models: %s", modelName, strings.Join(s.GetAvailableModels(), ", ")),
 		}
 	}
 

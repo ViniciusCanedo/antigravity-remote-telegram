@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"antigravity-telegram-remote/internal/database"
-	"antigravity-telegram-remote/internal/i18n"
 )
 
 type mockTemplateStore struct {
@@ -96,8 +95,8 @@ func TestSlashCommandHandler_ListEmpty(t *testing.T) {
 	if !result.Success {
 		t.Fatal("expected Success to be true")
 	}
-	expected := i18n.T("📝 No templates registered.")
-	if !strings.Contains(result.Message, expected) && !strings.Contains(result.Message, "No templates registered") {
+	expected := "📝 No templates registered."
+	if !strings.Contains(result.Message, expected) {
 		t.Fatalf("expected message to contain 'No templates registered', got %q", result.Message)
 	}
 }
@@ -181,8 +180,8 @@ func TestSlashCommandHandler_AddDuplicatedError(t *testing.T) {
 	if result.Success {
 		t.Fatal("expected Success to be false")
 	}
-	expected := i18n.T("⚠️ Failed to register template. Name might be duplicated.")
-	if !strings.Contains(result.Message, expected) && !strings.Contains(result.Message, "might be duplicated") {
+	expected := "⚠️ Failed to register template. Name might be duplicated."
+	if !strings.Contains(result.Message, expected) {
 		t.Fatalf("expected duplicate error message, got %q", result.Message)
 	}
 }

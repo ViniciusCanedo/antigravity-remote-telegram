@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-
-	"antigravity-telegram-remote/internal/i18n"
 )
 
 // AutoAcceptAction represents the requested auto-accept action.
@@ -63,7 +61,7 @@ func (s *AutoAcceptService) Handle(rawAction ...string) AutoAcceptCommandResult 
 			Success: false,
 			Enabled: s.enabled,
 			Changed: false,
-			Message: i18n.T("⚠️ Invalid argument. Usage: `/autoaccept [on/off/status]`"),
+			Message: "⚠️ Invalid argument. Usage: `/autoaccept [on/off/status]`",
 		}
 	}
 
@@ -76,7 +74,7 @@ func (s *AutoAcceptService) Handle(rawAction ...string) AutoAcceptCommandResult 
 			Success: true,
 			Enabled: s.enabled,
 			Changed: false,
-			Message: i18n.T(fmt.Sprintf("⚙️ Auto-accept mode: **%s**", statusStr)),
+			Message: fmt.Sprintf("⚙️ Auto-accept mode: **%s**", statusStr),
 		}
 	}
 
@@ -86,7 +84,7 @@ func (s *AutoAcceptService) Handle(rawAction ...string) AutoAcceptCommandResult 
 				Success: true,
 				Enabled: true,
 				Changed: false,
-				Message: i18n.T("ℹ️ Auto-accept mode is already **ON**."),
+				Message: "ℹ️ Auto-accept mode is already **ON**.",
 			}
 		}
 		s.enabled = true
@@ -94,7 +92,7 @@ func (s *AutoAcceptService) Handle(rawAction ...string) AutoAcceptCommandResult 
 			Success: true,
 			Enabled: true,
 			Changed: true,
-			Message: i18n.T("✅ Auto-accept mode turned **ON**. Future dialogs will be auto-allowed."),
+			Message: "✅ Auto-accept mode turned **ON**. Future dialogs will be auto-allowed.",
 		}
 	}
 
@@ -104,7 +102,7 @@ func (s *AutoAcceptService) Handle(rawAction ...string) AutoAcceptCommandResult 
 			Success: true,
 			Enabled: false,
 			Changed: false,
-			Message: i18n.T("ℹ️ Auto-accept mode is already **OFF**."),
+			Message: "ℹ️ Auto-accept mode is already **OFF**.",
 		}
 	}
 
@@ -113,7 +111,7 @@ func (s *AutoAcceptService) Handle(rawAction ...string) AutoAcceptCommandResult 
 		Success: true,
 		Enabled: false,
 		Changed: true,
-		Message: i18n.T("✅ Auto-accept mode turned **OFF**. Returned to manual approval."),
+		Message: "✅ Auto-accept mode turned **OFF**. Returned to manual approval.",
 	}
 }
 

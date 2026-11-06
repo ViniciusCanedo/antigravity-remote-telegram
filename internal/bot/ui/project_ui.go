@@ -40,7 +40,7 @@ func IsProjectSelectID(customID string) bool {
 func BuildProjectListUI(workspaces []string, page int) UIPayload {
 	if len(workspaces) == 0 {
 		return UIPayload{
-			Text:     "<b>📁 Dự án</b>\n\nKhông tìm thấy dự án nào.",
+			Text:     "<b>📁 Projects</b>\n\nNo projects found.",
 			Keyboard: NewInlineKeyboard(),
 		}
 	}
@@ -70,12 +70,12 @@ func BuildProjectListUI(workspaces []string, page int) UIPayload {
 		lines[i] = fmt.Sprintf("%d. %s", start+i+1, EscapeHTML(ws))
 	}
 
-	text := "<b>📁 Dự án</b>\n\n" +
-		"Chọn một dự án để tự động tạo topic và phiên làm việc\n\n" +
+	text := "<b>📁 Projects</b>\n\n" +
+		"Select a project to automatically create a topic and session\n\n" +
 		strings.Join(lines, "\n")
 
 	if totalPages > 1 {
-		text += fmt.Sprintf("\n\n<i>Trang %d / %d (%d tổng số dự án)</i>", safePage+1, totalPages, len(workspaces))
+		text += fmt.Sprintf("\n\n<i>Page %d / %d (%d total projects)</i>", safePage+1, totalPages, len(workspaces))
 	}
 
 	keyboard := NewInlineKeyboard()
@@ -89,10 +89,10 @@ func BuildProjectListUI(workspaces []string, page int) UIPayload {
 
 	if totalPages > 1 {
 		if safePage > 0 {
-			keyboard.Text("◀ Trước", fmt.Sprintf("%s:%d", ProjectPagePrefix, safePage-1))
+			keyboard.Text("◀ Prev", fmt.Sprintf("%s:%d", ProjectPagePrefix, safePage-1))
 		}
 		if safePage < totalPages-1 {
-			keyboard.Text("Tiếp ▶", fmt.Sprintf("%s:%d", ProjectPagePrefix, safePage+1))
+			keyboard.Text("Next ▶", fmt.Sprintf("%s:%d", ProjectPagePrefix, safePage+1))
 		}
 		keyboard.Row()
 	}

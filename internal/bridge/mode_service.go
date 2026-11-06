@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-
-	"antigravity-telegram-remote/internal/i18n"
 )
 
 // Mode represents the Antigravity execution mode.
@@ -39,13 +37,13 @@ var ModeUINameReverse = map[string]Mode{
 	"planning": ModePlan,
 }
 
-// GetModeDescription returns the translated description for the given mode.
+// GetModeDescription returns the description for the given mode.
 func GetModeDescription(mode Mode) string {
 	switch mode {
 	case ModeFast:
-		return i18n.T("Fast Mode — for simple tasks")
+		return "Fast Mode — for simple tasks"
 	case ModePlan:
-		return i18n.T("Plan Mode — for complex step-by-step tasks")
+		return "Plan Mode — for complex step-by-step tasks"
 	default:
 		return ""
 	}
@@ -81,7 +79,7 @@ func (s *ModeService) SetMode(modeName string) ModeSetResult {
 	if strings.TrimSpace(modeName) == "" {
 		return ModeSetResult{
 			Success: false,
-			Error:   i18n.T("⚠️ Mode name not specified. Available modes: ") + strings.Join(s.GetAvailableModes(), ", "),
+			Error:   "⚠️ Mode name not specified. Available modes: " + strings.Join(s.GetAvailableModes(), ", "),
 		}
 	}
 
@@ -97,7 +95,7 @@ func (s *ModeService) SetMode(modeName string) ModeSetResult {
 	if !valid {
 		return ModeSetResult{
 			Success: false,
-			Error:   i18n.T(fmt.Sprintf("⚠️ Invalid mode \"%s\". Available modes: %s", modeName, strings.Join(s.GetAvailableModes(), ", "))),
+			Error:   fmt.Sprintf("⚠️ Invalid mode \"%s\". Available modes: %s", modeName, strings.Join(s.GetAvailableModes(), ", ")),
 		}
 	}
 

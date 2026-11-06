@@ -6,7 +6,7 @@
 *.dylib
 bin/
 dist/
-/antigravity-bot
+/antigravity-telegram-remote
 
 # Test artifacts
 coverage.out

@@ -58,8 +58,8 @@ func TestBuildSessionPickerUI_MultipleSessions(t *testing.T) {
 func TestBuildSessionPickerUI_ZeroSessions(t *testing.T) {
 	res := BuildSessionPickerUI([]SessionListItem{})
 
-	if !strings.Contains(res.Text, "Không tìm thấy phiên nào") {
-		t.Errorf("expected 'Không tìm thấy phiên nào', got: %s", res.Text)
+	if !strings.Contains(res.Text, "No sessions found") {
+		t.Errorf("expected 'No sessions found', got: %s", res.Text)
 	}
 	if res.Keyboard == nil || len(res.Keyboard.InlineKeyboard) != 0 {
 		t.Errorf("expected empty keyboard, got %+v", res.Keyboard)

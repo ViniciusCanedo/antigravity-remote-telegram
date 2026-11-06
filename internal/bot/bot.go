@@ -102,21 +102,21 @@ const ClickStopButtonScript = `(() => {
 
 // BotCommands defines native Telegram bot commands registered via setMyCommands.
 var BotCommands = []models.BotCommand{
-	{Command: "start", Description: "Tin nhắn chào mừng"},
-	{Command: "help", Description: "Hiển thị tất cả lệnh"},
-	{Command: "project", Description: "Chọn một dự án"},
-	{Command: "new", Description: "Bắt đầu phiên chat mới"},
-	{Command: "chat", Description: "Thông tin phiên hiện tại"},
-	{Command: "mode", Description: "Thay đổi chế độ thực thi"},
-	{Command: "model", Description: "Thay đổi mô hình LLM"},
-	{Command: "stop", Description: "Dừng việc tạo kết quả"},
-	{Command: "screenshot", Description: "Chụp màn hình Antigravity"},
-	{Command: "template", Description: "Hiển thị mẫu lời nhắc"},
-	{Command: "template_add", Description: "Đăng ký một mẫu"},
-	{Command: "template_delete", Description: "Xóa một mẫu"},
-	{Command: "autoaccept", Description: "Bật/tắt chế độ tự động duyệt"},
-	{Command: "status", Description: "Tổng quan trạng thái bot"},
-	{Command: "ping", Description: "Kiểm tra độ trễ"},
+	{Command: "start", Description: "Welcome message"},
+	{Command: "help", Description: "Show all commands"},
+	{Command: "project", Description: "Select a project"},
+	{Command: "new", Description: "Start a new chat session"},
+	{Command: "chat", Description: "Current session info"},
+	{Command: "mode", Description: "Change execution mode"},
+	{Command: "model", Description: "Change LLM model"},
+	{Command: "stop", Description: "Interrupt active generation"},
+	{Command: "screenshot", Description: "Capture Antigravity screen"},
+	{Command: "template", Description: "Show prompt templates"},
+	{Command: "template_add", Description: "Register a template"},
+	{Command: "template_delete", Description: "Delete a template"},
+	{Command: "autoaccept", Description: "Toggle auto-accept mode"},
+	{Command: "status", Description: "Bot status overview"},
+	{Command: "ping", Description: "Check latency"},
 }
 
 // BotDeps contains all dependencies required to instantiate Bot.

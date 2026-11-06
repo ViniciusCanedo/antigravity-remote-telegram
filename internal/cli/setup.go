@@ -63,11 +63,11 @@ func ParseAllowedUserIDs(raw string) []string {
 func ValidateAllowedUserIDs(raw string) string {
 	ids := ParseAllowedUserIDs(raw)
 	if len(ids) == 0 {
-		return "Vui lòng nhập ít nhất một ID người dùng."
+		return "Please enter at least one user ID."
 	}
 	for _, id := range ids {
 		if !IsNumericString(id) {
-			return fmt.Sprintf("ID người dùng không hợp lệ: \"%s\" — phải là một chuỗi số.", id)
+			return fmt.Sprintf("Invalid user ID: \"%s\" — must be numeric.", id)
 		}
 	}
 	return ""
@@ -240,7 +240,7 @@ func ask(prompt string, reader *bufio.Reader, out io.Writer) (string, error) {
 }
 
 func stepHeader(out io.Writer, step, total int, title string) {
-	fmt.Fprintf(out, "  %s[Bước %d/%d]%s %s%s%s\n", ColorCyan, step, total, ColorReset, ColorBold, title, ColorReset)
+	fmt.Fprintf(out, "  %s[Step %d/%d]%s %s%s%s\n", ColorCyan, step, total, ColorReset, ColorBold, title, ColorReset)
 }
 
 func hint(out io.Writer, text string) {
@@ -260,13 +260,13 @@ func SetupActionWithIO(ctx context.Context, in io.Reader, out io.Writer, saveFn 
 	reader := bufio.NewReader(in)
 
 	fmt.Fprint(out, SetupLogo)
-	fmt.Fprintf(out, "  %sHướng dẫn cài đặt — %d bước%s\n\n", ColorBold, TotalSetupSteps, ColorReset)
+	fmt.Fprintf(out, "  %sSetup Guide — %d steps%s\n\n", ColorBold, TotalSetupSteps, ColorReset)
 
 	// Step 1: Telegram Bot Token
 	stepHeader(out, 1, TotalSetupSteps, "Telegram Bot Token")
-	hint(out, "1. Mở Telegram và tìm kiếm @BotFather")
-	hint(out, "2. Gửi lệnh /newbot và làm theo hướng dẫn để tạo bot mới")
-	hint(out, "3. Sao chép mã bot token mà BotFather cung cấp cho bạn")
+	hint(out, "1. Open Telegram and search for @BotFather")
+	hint(out, "2. Send /newbot and follow instructions to create a new bot")
+	hint(out, "3. Copy the bot token provided by BotFather")
 	hintBlank(out)
 
 	var token string
@@ -276,17 +276,17 @@ func SetupActionWithIO(ctx context.Context, in io.Reader, out io.Writer, saveFn 
 			return err
 		}
 		if !IsNonEmpty(rawToken) {
-			errMsg(out, "Token không được để trống.")
+			errMsg(out, "Token cannot be empty.")
 			continue
 		}
 		trimmed := strings.TrimSpace(rawToken)
-		fmt.Fprintf(out, "  %sĐang xác thực token...%s", ColorDim, ColorReset)
+		fmt.Fprintf(out, "  %sVerifying token...%s", ColorDim, ColorReset)
 
 		botInfo := VerifyTelegramToken(ctx, trimmed)
 		if botInfo != nil {
-			fmt.Fprintf(out, "\r  %sĐã xác thực!%s Bot: %s@%s%s (%s)\n", ColorGreen, ColorReset, ColorBold, botInfo.Username, ColorReset, botInfo.FirstName)
+			fmt.Fprintf(out, "\r  %sVerified!%s Bot: %s@%s%s (%s)\n", ColorGreen, ColorReset, ColorBold, botInfo.Username, ColorReset, botInfo.FirstName)
 		} else {
-			fmt.Fprintf(out, "\r  %sKhông thể xác thực trực tuyến%s — sử dụng token như hiện tại.\n", ColorYellow, ColorReset)
+			fmt.Fprintf(out, "\r  %sCould not verify online%s — using token as provided.\n", ColorYellow, ColorReset)
 		}
 		token = trimmed
 		break
@@ -294,11 +294,11 @@ func SetupActionWithIO(ctx context.Context, in io.Reader, out io.Writer, saveFn 
 	fmt.Fprintln(out, "")
 
 	// Step 2: Allowed Telegram User IDs
-	stepHeader(out, 2, TotalSetupSteps, "ID người dùng Telegram được phép")
-	hint(out, "Chỉ những người dùng này mới có thể gửi lệnh cho bot.")
-	hint(out, "1. Mở Telegram và tìm kiếm @raw_data_bot")
-	hint(out, "2. Gửi bất kỳ tin nhắn nào — nó sẽ trả lời bằng ID người dùng (số) của bạn")
-	hint(out, "Nhiều ID: phân tách bằng dấu phẩy (ví dụ: 123456,789012)")
+	stepHeader(out, 2, TotalSetupSteps, "Allowed Telegram User IDs")
+	hint(out, "Only these users will be allowed to interact with the bot.")
+	hint(out, "1. Open Telegram and search for @raw_data_bot")
+	hint(out, "2. Send any message — it will reply with your numeric user ID")
+	hint(out, "Multiple IDs: separate with commas (e.g. 123456,789012)")
 	hintBlank(out)
 
 	var allowedUserIDs []string
@@ -317,11 +317,11 @@ func SetupActionWithIO(ctx context.Context, in io.Reader, out io.Writer, saveFn 
 	fmt.Fprintln(out, "")
 
 	// Step 3: Workspace Directory
-	stepHeader(out, 3, TotalSetupSteps, "Thư mục gốc của Workspace")
-	hint(out, "Thư mục cha chứa các dự án code của bạn.")
-	hint(out, "Mỗi thư mục con sẽ trở thành một dự án có thể chọn trên Telegram qua lệnh /project.")
-	hint(out, "Bạn có thể thay đổi mục này sau tại ~/.antigravity-telegram-remote/config.json hoặc chạy lại lệnh setup.")
-	hint(out, "Nhấn Tab để tự động hoàn thành đường dẫn thư mục.")
+	stepHeader(out, 3, TotalSetupSteps, "Workspace Base Directory")
+	hint(out, "The parent directory containing your code repositories.")
+	hint(out, "Each subfolder becomes a selectable project in Telegram via /project.")
+	hint(out, "You can change this later in ~/.antigravity-telegram-remote/config.json or by re-running setup.")
+	hint(out, "Press Tab to auto-complete directory paths.")
 	hintBlank(out)
 
 	home, _ := os.UserHomeDir()
@@ -340,7 +340,7 @@ func SetupActionWithIO(ctx context.Context, in io.Reader, out io.Writer, saveFn 
 		expanded := ExpandTilde(selected)
 		resolved, absErr := filepath.Abs(expanded)
 		if absErr != nil {
-			errMsg(out, "Vui lòng nhập một thư mục hợp lệ.")
+			errMsg(out, "Please enter a valid directory.")
 			continue
 		}
 
@@ -350,7 +350,7 @@ func SetupActionWithIO(ctx context.Context, in io.Reader, out io.Writer, saveFn 
 			break
 		}
 
-		confirmPrompt := fmt.Sprintf("  %s\"%s\" không tồn tại. Tạo thư mục này? (y/n):%s ", ColorYellow, resolved, ColorReset)
+		confirmPrompt := fmt.Sprintf("  %s\"%s\" does not exist. Create this directory? (y/n):%s ", ColorYellow, resolved, ColorReset)
 		ans, cErr := ask(confirmPrompt, reader, out)
 		if cErr == nil && strings.ToLower(strings.TrimSpace(ans)) == "y" {
 			if mErr := os.MkdirAll(resolved, 0755); mErr == nil {
@@ -358,7 +358,7 @@ func SetupActionWithIO(ctx context.Context, in io.Reader, out io.Writer, saveFn 
 				break
 			}
 		}
-		errMsg(out, "Vui lòng nhập một thư mục hợp lệ.")
+		errMsg(out, "Please enter a valid directory.")
 	}
 	fmt.Fprintln(out, "")
 
@@ -383,14 +383,14 @@ func SetupActionWithIO(ctx context.Context, in io.Reader, out io.Writer, saveFn 
 		portsStr[i] = fmt.Sprintf("%d", p)
 	}
 
-	fmt.Fprintf(out, "  %sCài đặt hoàn tất!%s\n\n", ColorGreen, ColorReset)
-	fmt.Fprintf(out, "  %sĐã lưu tại%s %s\n\n", ColorDim, ColorReset, configPath)
-	fmt.Fprintf(out, "  %sCác bước tiếp theo:%s\n", ColorCyan, ColorReset)
-	fmt.Fprintf(out, "  %s1.%s Mở Antigravity với CDP được bật:\n", ColorBold, ColorReset)
+	fmt.Fprintf(out, "  %sSetup completed!%s\n\n", ColorGreen, ColorReset)
+	fmt.Fprintf(out, "  %sSaved to%s %s\n\n", ColorDim, ColorReset, configPath)
+	fmt.Fprintf(out, "  %sNext steps:%s\n", ColorCyan, ColorReset)
+	fmt.Fprintf(out, "  %s1.%s Open Antigravity with CDP enabled:\n", ColorBold, ColorReset)
 	fmt.Fprintf(out, "     %santigravity-telegram-remote open%s\n", ColorGreen, ColorReset)
-	fmt.Fprintf(out, "     %s(tự động chọn một cổng khả dụng từ: %s)%s\n\n", ColorDim, strings.Join(portsStr, ", "), ColorReset)
-	fmt.Fprintf(out, "  %s2.%s Chạy lệnh: %santigravity-telegram-remote start%s\n\n", ColorBold, ColorReset, ColorGreen, ColorReset)
-	fmt.Fprintf(out, "  %s3.%s Mở Telegram và gửi tin nhắn cho bot của bạn!\n\n", ColorBold, ColorReset)
+	fmt.Fprintf(out, "     %s(automatically selects an available port from: %s)%s\n\n", ColorDim, strings.Join(portsStr, ", "), ColorReset)
+	fmt.Fprintf(out, "  %s2.%s Run: %santigravity-telegram-remote start%s\n\n", ColorBold, ColorReset, ColorGreen, ColorReset)
+	fmt.Fprintf(out, "  %s3.%s Open Telegram and message your bot!\n\n", ColorBold, ColorReset)
 
 	return nil
 }

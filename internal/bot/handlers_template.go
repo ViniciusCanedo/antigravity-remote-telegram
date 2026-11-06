@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"antigravity-telegram-remote/internal/database"
-	"antigravity-telegram-remote/internal/i18n"
 )
 
 // CommandResult represents the result of executing a command handled by SlashCommandHandler.
@@ -49,7 +48,7 @@ func (h *SlashCommandHandler) HandleCommand(commandName string, args []string) C
 	default:
 		return CommandResult{
 			Success: false,
-			Message: i18n.T(fmt.Sprintf("⚠️ Unknown command: /%s", commandName)),
+			Message: fmt.Sprintf("⚠️ Unknown command: /%s", commandName),
 		}
 	}
 }
@@ -60,7 +59,7 @@ func (h *SlashCommandHandler) handleTemplateCommand(args []string) CommandResult
 		if err != nil || len(templates) == 0 {
 			return CommandResult{
 				Success: true,
-				Message: i18n.T("📝 No templates registered."),
+				Message: "📝 No templates registered.",
 			}
 		}
 
@@ -71,7 +70,7 @@ func (h *SlashCommandHandler) handleTemplateCommand(args []string) CommandResult
 		list := strings.Join(lines, "\n")
 		return CommandResult{
 			Success: true,
-			Message: i18n.T(fmt.Sprintf("📝 Registered Templates:\n%s\n\nTo use: `/template [name]`", list)),
+			Message: fmt.Sprintf("📝 Registered Templates:\n%s\n\nTo use: `/template [name]`", list),
 		}
 	}
 
@@ -82,7 +81,7 @@ func (h *SlashCommandHandler) handleTemplateCommand(args []string) CommandResult
 		if len(args) < 3 {
 			return CommandResult{
 				Success: false,
-				Message: i18n.T("⚠️ Missing arguments.\nUsage: `/template add \"name\" \"prompt\"`"),
+				Message: "⚠️ Missing arguments.\nUsage: `/template add \"name\" \"prompt\"`",
 			}
 		}
 		name := args[1]
@@ -95,12 +94,12 @@ func (h *SlashCommandHandler) handleTemplateCommand(args []string) CommandResult
 		if err != nil {
 			return CommandResult{
 				Success: false,
-				Message: i18n.T("⚠️ Failed to register template. Name might be duplicated."),
+				Message: "⚠️ Failed to register template. Name might be duplicated.",
 			}
 		}
 		return CommandResult{
 			Success: true,
-			Message: i18n.T(fmt.Sprintf("✅ Template **%s** registered.", name)),
+			Message: fmt.Sprintf("✅ Template **%s** registered.", name),
 		}
 	}
 
@@ -109,7 +108,7 @@ func (h *SlashCommandHandler) handleTemplateCommand(args []string) CommandResult
 		if len(args) < 2 {
 			return CommandResult{
 				Success: false,
-				Message: i18n.T("⚠️ Specify a template name to delete.\nUsage: `/template delete \"name\"`"),
+				Message: "⚠️ Specify a template name to delete.\nUsage: `/template delete \"name\"`",
 			}
 		}
 		name := args[1]
@@ -117,12 +116,12 @@ func (h *SlashCommandHandler) handleTemplateCommand(args []string) CommandResult
 		if err == nil && deleted {
 			return CommandResult{
 				Success: true,
-				Message: i18n.T(fmt.Sprintf("🗑️ Template **%s** deleted.", name)),
+				Message: fmt.Sprintf("🗑️ Template **%s** deleted.", name),
 			}
 		}
 		return CommandResult{
 			Success: false,
-			Message: i18n.T(fmt.Sprintf("⚠️ Template **%s** not found.", name)),
+			Message: fmt.Sprintf("⚠️ Template **%s** not found.", name),
 		}
 	}
 
@@ -132,13 +131,13 @@ func (h *SlashCommandHandler) handleTemplateCommand(args []string) CommandResult
 	if err != nil || tmpl == nil {
 		return CommandResult{
 			Success: false,
-			Message: i18n.T(fmt.Sprintf("⚠️ Template **%s** not found.", templateName)),
+			Message: fmt.Sprintf("⚠️ Template **%s** not found.", templateName),
 		}
 	}
 
 	return CommandResult{
 		Success: true,
-		Message: i18n.T(fmt.Sprintf("📝 Invoked template **%s**.\nStarting process with this prompt.", templateName)),
+		Message: fmt.Sprintf("📝 Invoked template **%s**.\nStarting process with this prompt.", templateName),
 		Prompt:  tmpl.Prompt,
 	}
 }

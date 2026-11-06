@@ -52,10 +52,10 @@ func TestNewRootCmd_Structure(t *testing.T) {
 
 	// Subcommands
 	expectedSubcmds := map[string]string{
-		"start":  "Bắt đầu bot Telegram",
-		"setup":  "Trình hướng dẫn thiết lập tương tác",
-		"open":   "Mở Antigravity với CDP được bật (tự động chọn cổng khả dụng)",
-		"doctor": "Kiểm tra môi trường và các phụ thuộc",
+		"start":  "Start the Telegram bot",
+		"setup":  "Interactive setup wizard",
+		"open":   "Open Antigravity with CDP enabled (automatically selects an available port)",
+		"doctor": "Check environment and dependencies",
 	}
 
 	subcmds := cmd.Commands()

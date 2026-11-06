@@ -133,8 +133,8 @@ func TestHandleTextMessage_SlashCommandsAndRouting(t *testing.T) {
 		t.Fatalf("expected reply for /autoaccept")
 	}
 	msgText := sender.sentMessages[len(sender.sentMessages)-1].Text
-	if !strings.Contains(msgText, "ON") && !strings.Contains(msgText, "BẬT") {
-		t.Errorf("expected autoaccept reply to mention ON or BẬT, got %q", msgText)
+	if !strings.Contains(msgText, "ON") {
+		t.Errorf("expected autoaccept reply to mention ON, got %q", msgText)
 	}
 
 	// 2. /status command
