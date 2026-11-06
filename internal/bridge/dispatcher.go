@@ -10,9 +10,11 @@ import (
 
 // InboundImageAttachment represents an incoming image attachment.
 type InboundImageAttachment struct {
-	FileName string
-	MimeType string
-	Base64   string
+	FileName  string
+	MimeType  string
+	Base64    string
+	LocalPath string
+	URL       string
 }
 
 // PromptDispatchOptions contains optional context and repositories for dispatching.
@@ -146,4 +148,11 @@ func (d *PromptDispatcher) Send(ctx context.Context, req PromptDispatchRequest) 
 	}
 
 	return nil
+}
+
+// SetSendPromptImpl dynamically sets or updates the SendPromptImpl function.
+func (d *PromptDispatcher) SetSendPromptImpl(fn SendPromptFunc) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.deps.SendPromptImpl = fn
 }
